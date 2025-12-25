@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements
     const previousOperandTextElement = document.getElementById('previous-operand');
     const currentOperandTextElement = document.getElementById('current-operand');
     const numberButtons = document.querySelectorAll('[data-number]');
@@ -7,15 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const equalsButton = document.getElementById('equals');
     const deleteButton = document.getElementById('delete');
     const allClearButton = document.getElementById('clear');
-
-    // Calculator State
     let currentInput = '0';
     let expressionHistory = '';
     let shouldResetScreen = false;
     let hasError = false;
-
-    // Core Functions
-
     function clear() {
         currentInput = '0';
         expressionHistory = '';
@@ -71,16 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (hasError) return;
 
         let fullExpression = expressionHistory;
-
-        // If there's pending input (normal case), add it.
-        // If shouldResetScreen is true (e.g. user pressed 5 + then =), we should probably ignore the operator or handle it.
-        // Standard calc behavior: 5 + = -> 10 (repeats op). For simplicity, let's just append current input.
         if (!shouldResetScreen || currentInput !== '0') {
             fullExpression += currentInput;
         } else {
-            // Edge case: user typed '5 +' then '='. History is '5 + '.
-            // Let's remove the trailing operator for safety or leave it to eval to fail?
-            // Safest is to trim trailing operator.
             fullExpression = fullExpression.trim();
             const lastChar = fullExpression.slice(-1);
             if ('+ - * / %'.includes(lastChar)) {
@@ -89,19 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // Replace visual operators with JS operators
-            // The logic actually uses same chars mostly, except '÷' if we used that in UI text but I used standard data attributes.
-            // data-operation passed symbols. We need to be careful if innerText was used.
-            // My html uses data-operation="*", "/", "+", "-". So we are good.
-
-            // Check for / 0
             if (/\/ 0(?!\.)/.test(fullExpression) || /\/ 0$/.test(fullExpression)) {
                 throw new Error("Division by Zero");
             }
-
-            // Safe evaluation (restricted to math context)
-            // We use Function constructor which is slightly safer than direct eval, but purely math input is generally safe to strict-sanitize.
-            // Using a simple sanitizer.
             if (/[^0-9.+\-*/% ]/.test(fullExpression)) {
                 throw new Error("Invalid Input");
             }
@@ -151,13 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         currentOperandTextElement.innerText = getDisplayNumber(currentInput);
-
-        // Show the expression history in the top bar
-        // If we just computed, history is empty, show nothing
         previousOperandTextElement.innerText = expressionHistory;
     }
-
-    // Event Listeners
 
     numberButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -209,3 +181,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize
     clear();
 });
+
